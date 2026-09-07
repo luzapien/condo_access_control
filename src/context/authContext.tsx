@@ -1,4 +1,3 @@
-// src/context/AuthContext.tsx
 import {
   createContext,
   useContext,
@@ -35,13 +34,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Fetch role/profile data from Supabase
   const fetchProfile = async (userId: string) => {
-    console.log(userId)
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", userId)
-      .maybeSingle(); // <-- Devuelve null en lugar de romper la app si no existe
-
+      .maybeSingle();
     if (!error && data) {
       setProfile(data);
     } else {

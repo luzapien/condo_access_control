@@ -13,9 +13,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { RecentVehicles } from "./recentVehicles";
 import { VisitorRegisterModal } from "../visitors/visitorRegisterModal";
+import { Header } from "../shared/header";
 
 export default function GuardSearch() {
-  // const { user, profile, signOut, } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [result, setResult] = useState<VehicleWithHouse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -57,18 +57,7 @@ export default function GuardSearch() {
         open={isRegisterVehicleOpen}
       />
       <div className="space-y-4 w-full rounded-2xl ">
-        <header className="bg-[#2d4a3e] text-white sticky top-0 z-30 shadow-md">
-          <div className="px-4 py-3.5 bg-[#2d4a3e] flex items-center justify-between">
-            <div>
-              <div className="text-[11px] font-bold  tracking-wider text-emerald-200/90">
-                COTO PARQUE ARRAYANES 6
-              </div>
-              <h1 className="text-lg font-bold text-white tracking-tight leading-tight">
-                Puerta de Seguridad
-              </h1>
-            </div>
-          </div>
-        </header>
+          <Header/>
         <section className="bg-white rounded-2xl p-4 shadow-sm border border-stone-200">
           <label className="block text-lg font-bold  tracking-wider text-stone-700 mb-1.5">
             Buscador de Vehículos
