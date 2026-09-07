@@ -38,19 +38,17 @@ export function Login() {
     <div className="min-h-screen flex items-center justify-center bg-[#f5f6f4] px-4 font-sans">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-stone-200 p-6 space-y-6">
         
-        {/* Encabezado del Login */}
         <div className="text-center space-y-1">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-[#344c3d]">
+          <div className="text-[11px] font-bold  tracking-wider text-[#344c3d]">
             COTO PARQUE ARRAYANES 6
           </div>
           <h1 className="text-xl font-bold text-stone-900">Acceso a Seguridad</h1>
           <p className="text-xs text-stone-500">Ingresa tus credenciales de guardia o administrador</p>
         </div>
 
-        {/* Formulario */}
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+            <label className="block text-xs font-bold  tracking-wider text-stone-700 mb-1.5">
               Correo Electrónico
             </label>
             <input
@@ -64,7 +62,7 @@ export function Login() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+            <label className="block text-xs font-bold  tracking-wider text-stone-700 mb-1.5">
               Contraseña
             </label>
             <input

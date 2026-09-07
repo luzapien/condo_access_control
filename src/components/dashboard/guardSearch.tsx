@@ -2,11 +2,15 @@ import { useState } from "react";
 import { toast } from "sonner";
 import {
   getVehiclesWithHousesQuery,
-  // vehiclesWithHousesQuery,
   type VehicleWithHouse,
 } from "../../api/vehicles";
 
-import { TruckIcon } from "@heroicons/react/24/outline";
+import {
+  TruckIcon,
+  HomeIcon,
+  CheckCircleIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
 import { RecentVehicles } from "./recentVehicles";
 import { VisitorRegisterModal } from "../visitors/visitorRegisterModal";
 
@@ -26,7 +30,6 @@ export default function GuardSearch() {
     setError("");
     setResult(null);
 
-    // Llamamos a la función para instanciar una nueva consulta limpia
     const { data, error } = await getVehiclesWithHousesQuery()
       .ilike("license_plate", `%${searchTerm.trim()}%`)
       .maybeSingle();
@@ -57,7 +60,7 @@ export default function GuardSearch() {
         <header className="bg-[#2d4a3e] text-white sticky top-0 z-30 shadow-md">
           <div className="px-4 py-3.5 bg-[#2d4a3e] flex items-center justify-between">
             <div>
-              <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-200/90">
+              <div className="text-[11px] font-bold  tracking-wider text-emerald-200/90">
                 COTO PARQUE ARRAYANES 6
               </div>
               <h1 className="text-lg font-bold text-white tracking-tight leading-tight">
@@ -74,19 +77,7 @@ export default function GuardSearch() {
           <form onSubmit={searchVehicle} className="flex gap-2">
             <div className="relative flex-1">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-400">
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  ></path>
-                </svg>
+                <MagnifyingGlassIcon className="size-6" />
               </div>
 
               <input
@@ -135,20 +126,7 @@ export default function GuardSearch() {
                 className={`px-4 py-3 flex items-center justify-between text-white shadow-inner ${result.vehicle_type === "visitor" ? "bg-blue-600" : "bg-[#2d4a3e]"}`}
               >
                 <div className="flex items-center space-x-2.5">
-                  <div className="bg-white text-stone-900 p-1.5 rounded-full shadow-sm">
-                    <svg
-                      className="w-5 h-5 stroke-[2.5]"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
-                      ></path>
-                    </svg>
-                  </div>
+                  <CheckCircleIcon className="size-10" />
                   <div>
                     <div className="text-[11px] font-bold  tracking-wider text-emerald-200/90 leading-tight">
                       Estado Oficial
@@ -168,7 +146,7 @@ export default function GuardSearch() {
               <div className="p-4 space-y-3.5 bg-linear-to-b from-white to-[#f7f9f7]/50">
                 <div className="flex items-center justify-between bg-[#f8faf8] p-3 rounded-2xl border border-stone-200">
                   <div>
-                    <span className="block text-[11px] font-bold uppercase text-stone-400 tracking-wider">
+                    <span className="block text-[11px] font-bold  text-stone-400 tracking-wider">
                       Placa Registrada
                     </span>
                     <div className="mt-1 inline-flex items-center bg-white border border-stone-800 rounded px-3 py-1 text-stone-900 font-mono text-xl font-black tracking-widest shadow-inner">
@@ -177,7 +155,7 @@ export default function GuardSearch() {
                   </div>
                   {result.vehicle_type === "visitor" && (
                     <div className="text-right">
-                      <span className="block text-[11px] font-semibold text-stone-400 uppercase">
+                      <span className="block text-[11px] font-semibold text-stone-400 ">
                         Visitante
                       </span>
                       <span className="text-xs font-bold text-stone-800 block mt-1">
@@ -209,19 +187,7 @@ export default function GuardSearch() {
             <section className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
               <div className="bg-[#f8faf8] px-4 py-2.5 border-b border-stone-200 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <svg
-                    className="w-4 h-4 text-[#344c3d]"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                    ></path>
-                  </svg>
+                  <HomeIcon className="size-4" />
                   <h2 className="text-xs font-bold  tracking-wider text-stone-700">
                     Información de la Casa
                   </h2>
@@ -231,7 +197,7 @@ export default function GuardSearch() {
               <div className="p-4 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-[#f8faf8] p-3 rounded-2xl border border-stone-200/80">
-                    <span className="block text-[11px] font-semibold text-stone-400 uppercase">
+                    <span className="block text-[11px] font-semibold text-stone-400 ">
                       Casa No.
                     </span>
                     <span className="text-xl font-black text-stone-900 tracking-tight">
@@ -239,7 +205,7 @@ export default function GuardSearch() {
                     </span>
                   </div>
                   <div className="bg-[#f8faf8] p-3 rounded-2xl border border-stone-200/80">
-                    <span className="block text-[11px] font-semibold text-stone-400 uppercase">
+                    <span className="block text-[11px] font-semibold text-stone-400 ">
                       Tipo Usuario
                     </span>
                     <span className="text-sm font-bold text-stone-800 inline-flex items-center mt-1">
@@ -252,7 +218,7 @@ export default function GuardSearch() {
 
                 <div className="p-3 rounded-2xl bg-[#f8faf8] border border-stone-200/80 flex items-center justify-between">
                   <div>
-                    <span className="block text-[11px] font-semibold text-stone-400 uppercase">
+                    <span className="block text-[11px] font-semibold text-stone-400 ">
                       Propietario / Residente
                     </span>
                     <span className="text-base font-bold text-stone-900 block">
@@ -266,7 +232,7 @@ export default function GuardSearch() {
 
                 <div className="p-3 rounded-2xl bg-[#f3f7f4] border border-[#cbe0d3] flex items-center justify-between">
                   <div>
-                    <span className="block text-[11px] font-semibold text-[#344c3d] uppercase">
+                    <span className="block text-[11px] font-semibold text-[#344c3d] ">
                       Teléfono
                     </span>
                     <span className="text-base font-mono font-bold text-stone-900 tracking-wider">
@@ -284,9 +250,13 @@ export default function GuardSearch() {
             setResult={setResult}
           />
         )}
+        <button
+          className="p-3 box-border w-full bg-[#344e41] text-white border-none rounded-2xl text-base font-bold cursor-pointer hover:opacity-90 transition-opacity"
+          onClick={() => setIsRegisterVehicleOpen(true)}
+        >
+          Registro de Vehículo de Visitante
+        </button>
       </div>
-
-      <button className="p-3 box-border w-full bg-[#344e41] text-white border-none rounded-2xl text-base font-bold cursor-pointer hover:opacity-90 transition-opacity" onClick={() => setIsRegisterVehicleOpen(true)}>Registro de Vehículo de Visitante</button>
     </>
   );
 }

@@ -5,6 +5,7 @@ import {
   type VehicleWithHouse,
 } from "../../api/vehicles";
 import { DocumentCheckIcon } from "@heroicons/react/24/outline";
+import { Spinner } from "../shared/spinner";
 
 interface RecentVehiclesProps {
   setSearchTerm: (params: string) => void;
@@ -16,12 +17,14 @@ export function RecentVehicles({
   setSearchTerm,
   setResult,
 }: RecentVehiclesProps) {
+  const [loading, setLoading] = useState(false);
   const [recentVehicles, setRecentVehicles] = useState<VehiclesWithHouses>([]);
-  
+
   useEffect(() => {
     let cancelled = false;
 
     const loadRecentVehicles = async () => {
+      setLoading(true);
       const { data, error } = await getVehiclesWithHousesQuery()
         .order("created_at", { ascending: false })
         .limit(5);
@@ -30,6 +33,7 @@ export function RecentVehicles({
         console.error("Error al cargar recientes:", error);
       } else if (!cancelled) {
         setRecentVehicles(data);
+        setLoading(false);
       }
     };
 
@@ -39,6 +43,10 @@ export function RecentVehicles({
       cancelled = true;
     };
   }, []);
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   return (
     <section className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
@@ -64,11 +72,7 @@ export function RecentVehicles({
       </div>
 
       <div className="divide-y divide-stone-100">
-        {recentVehicles.length === 0 ? (
-          <p className="p-4 text-xs text-stone-400 text-center">
-            No hay registros recientes.
-          </p>
-        ) : (
+        {recentVehicles.length > 0 &&
           recentVehicles.map((item) => {
             const formattedTime = new Date(item.created_at).toLocaleString();
 
@@ -149,8 +153,7 @@ export function RecentVehicles({
                 </div>
               </div>
             );
-          })
-        )}
+          })}
       </div>
     </section>
   );
