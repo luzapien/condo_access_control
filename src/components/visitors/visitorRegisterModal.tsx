@@ -14,7 +14,7 @@ interface House {
   id: string;
   house_number: string;
   owner: string;
-  phone?: string;
+  phone?: string | null;
 }
 
 interface VisitorRegisterModalProps extends React.ComponentProps<
@@ -24,6 +24,8 @@ interface VisitorRegisterModalProps extends React.ComponentProps<
   onOpenChange: (open: boolean) => void;
 }
 
+const STORAGE_KEY = "visitor_form_draft";
+
 export function VisitorRegisterModal(props: VisitorRegisterModalProps) {
   const [houses, setHouses] = useState<House[]>([]);
   const [loading, setLoading] = useState(false);
@@ -32,22 +34,39 @@ export function VisitorRegisterModal(props: VisitorRegisterModalProps) {
   const [showHouseDropdown, setShowHouseDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
-  const [formData, setFormData] = useState({
-    licensePlate: "",
-    brand: "",
-    model: "",
-    color: "",
-    visitorName: "",
-    houseId: "",
-    houseDisplay: "",
+  const [formData, setFormData] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error("Error al leer el borrador:", e);
+      }
+    }
+    return {
+      licensePlate: "",
+      brand: "",
+      model: "",
+      color: "",
+      visitorName: "",
+      addressee: "",
+      houseId: "",
+      houseDisplay: "",
+    };
   });
+
+  const [selectedHouse, setSelectedHouse] = useState<House | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+  }, [formData]);
 
   useEffect(() => {
     let active = true;
 
     void supabase
       .from("houses")
-      .select("id, house_number, owner")
+      .select("id, house_number, owner, phone")
       .order("house_number", { ascending: true })
       .then(({ data, error }) => {
         if (!active) return;
@@ -56,18 +75,24 @@ export function VisitorRegisterModal(props: VisitorRegisterModalProps) {
           console.error("Error fetching houses:", error);
           toast.error("Error al cargar las casas.");
         } else {
-          setHouses(data || []);
+          const houseList = data || [];
+          setHouses(houseList);
+
+          if (formData.houseId && !selectedHouse) {
+            const found = houseList.find((h) => h.id === formData.houseId);
+            if (found) setSelectedHouse(found);
+          }
         }
       });
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [formData.houseId, selectedHouse]);
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
+    setFormData((prevData: any) => ({
       ...prevData,
       [name]: name === "licensePlate" ? value.toUpperCase() : value,
     }));
@@ -82,7 +107,8 @@ export function VisitorRegisterModal(props: VisitorRegisterModalProps) {
   );
 
   const handleSelectHouse = (house: House) => {
-    setFormData((prev) => ({
+    setSelectedHouse(house);
+    setFormData((prev: any) => ({
       ...prev,
       houseId: house.id,
       houseDisplay: `Casa ${house.house_number} - ${house.owner}`,
@@ -109,6 +135,7 @@ export function VisitorRegisterModal(props: VisitorRegisterModalProps) {
         model: formData.model,
         color: formData.color,
         vehicle_type: "visitor",
+        addressee: formData.addressee,
         visitor_name: formData.visitorName,
         house_id: formData.houseId,
       },
@@ -123,15 +150,19 @@ export function VisitorRegisterModal(props: VisitorRegisterModalProps) {
       );
     } else {
       toast.success("¡Visitante registrado con éxito!");
-      setFormData({
+      const resetState = {
         licensePlate: "",
         brand: "",
         model: "",
         color: "",
         visitorName: "",
+        addressee: "",
         houseId: "",
         houseDisplay: "",
-      });
+      };
+      setFormData(resetState);
+      localStorage.removeItem(STORAGE_KEY);
+      setSelectedHouse(null);
       props.onOpenChange(false);
     }
   };
@@ -143,7 +174,10 @@ export function VisitorRegisterModal(props: VisitorRegisterModalProps) {
           <DialogTitle>Registro del visitante</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleRegisterVisitor} className="flex flex-col gap-3 px-6 pb-6">
+        <form
+          onSubmit={handleRegisterVisitor}
+          className="flex flex-col gap-3 px-6 pb-6"
+        >
           <div className="flex flex-col flex-1">
             <label className="block text-sm mb-1 font-bold text-[#333]">
               Número de Placa:
@@ -169,6 +203,21 @@ export function VisitorRegisterModal(props: VisitorRegisterModalProps) {
               value={formData.visitorName}
               onChange={handleChange}
               placeholder="Nombre completo"
+              required
+              className="w-full p-2.5 rounded-2xl border border-stone-300 box-border text-sm focus:outline-none focus:ring-2 focus:ring-[#344e41]"
+            />
+          </div>
+
+          <div className="flex flex-col flex-1">
+            <label className="block text-sm mb-1 font-bold text-[#333]">
+              A quien visita:
+            </label>
+            <input
+              type="text"
+              name="addressee"
+              value={formData.addressee}
+              onChange={handleChange}
+              placeholder="Persona a la que visita"
               required
               className="w-full p-2.5 rounded-2xl border border-stone-300 box-border text-sm focus:outline-none focus:ring-2 focus:ring-[#344e41]"
             />
@@ -228,11 +277,12 @@ export function VisitorRegisterModal(props: VisitorRegisterModalProps) {
               onChange={(e) => {
                 setHouseSearchTerm(e.target.value);
                 if (formData.houseId) {
-                  setFormData((prev) => ({
+                  setFormData((prev: any) => ({
                     ...prev,
                     houseId: "",
                     houseDisplay: "",
                   }));
+                  setSelectedHouse(null);
                 }
                 setShowHouseDropdown(true);
               }}
@@ -244,13 +294,25 @@ export function VisitorRegisterModal(props: VisitorRegisterModalProps) {
             {showHouseDropdown && (
               <ul className="absolute top-full left-0 right-0 bg-white border border-stone-300 rounded-b-md max-h-37.5 overflow-y-auto list-none p-0 m-0 z-1100 shadow-md">
                 {filteredHouses.length > 0 ? (
-                  filteredHouses.map((house) => (
+                  filteredHouses.map((item) => (
                     <li
-                      key={house.id}
-                      onClick={() => handleSelectHouse(house)}
-                      className="p-2 cursor-pointer border-b border-stone-100 text-sm hover:bg-stone-100"
+                      key={item.id}
+                      onClick={() => handleSelectHouse(item)}
+                      className="p-2 cursor-pointer border-b border-stone-100 text-sm hover:bg-stone-100 flex justify-between items-center"
                     >
-                      <strong>Casa {house.house_number}</strong> - {house.owner}
+                      <div>
+                        <strong>Casa {item.house_number}</strong> - {item.owner}
+                      </div>
+                      {item.phone && (
+                        <a
+                          href={`tel:${item.phone}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-blue-600 hover:text-blue-800 p-1"
+                          title={`Llamar a ${item.phone}`}
+                        >
+                          📞
+                        </a>
+                      )}
                     </li>
                   ))
                 ) : (
@@ -260,10 +322,40 @@ export function VisitorRegisterModal(props: VisitorRegisterModalProps) {
                 )}
               </ul>
             )}
+
+            {selectedHouse && (
+              <div className="mt-2 p-2.5 bg-stone-50 rounded-xl border border-stone-200 flex justify-between items-center text-sm">
+                <span className="text-stone-700 font-medium">
+                  Llamar a propietario
+                </span>
+                {selectedHouse.phone ? (
+                  <a
+                    href={`tel:${selectedHouse.phone}`}
+                    className="inline-flex items-center gap-1.5 text-blue-600 hover:underline font-bold"
+                  >
+                    📞 {selectedHouse.phone}
+                  </a>
+                ) : (
+                  <span className="text-stone-400 text-xs italic">
+                    Sin teléfono registrado
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           <DialogFooter>
-            <DialogClose render={(<button className="p-2 text-white bg-gray-400 border-none rounded-2xl text-sm font-bold cursor-pointer hover:opacity-95 transition-opacity disabled:opacity-50"></button>)}>Cancelar</DialogClose>
+            <DialogClose
+              render={
+                <button
+                  type="button"
+                  className="p-2 text-white bg-gray-400 border-none rounded-2xl text-sm font-bold cursor-pointer hover:opacity-95 transition-opacity disabled:opacity-50"
+                  onClick={() => localStorage.removeItem(STORAGE_KEY)}
+                />
+              }
+            >
+              Cancelar
+            </DialogClose>
             <button
               type="submit"
               disabled={loading}
