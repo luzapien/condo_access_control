@@ -3,8 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/authContext";
 import { ProtectedRoute } from "./components/protectedRoutes";
 import { Login } from "./components/auth/login";
-import GuardSearch from "./components/dashboard/guardSearch";
 import { Toaster } from "sonner";
+import SearcherVehicles from "./components/dashboard/searcherVehicles";
 
 export default function App() {
   return (
@@ -17,7 +17,7 @@ export default function App() {
 
           {/* Protected Routes (Condo Access Control) */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<GuardSearch />} />
+            <Route path="/dashboard" element={<SearcherVehicles />} />
           </Route>
 
           {/* Catch-all redirect */}

@@ -9,6 +9,7 @@ import {
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "../../supabase/client";
+import { PhoneIcon } from "@heroicons/react/24/outline";
 
 interface House {
   id: string;
@@ -307,10 +308,10 @@ export function VisitorRegisterModal(props: VisitorRegisterModalProps) {
                         <a
                           href={`tel:${item.phone}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="text-blue-600 hover:text-blue-800 p-1"
+                          className="p-1"
                           title={`Llamar a ${item.phone}`}
                         >
-                          📞
+                           <PhoneIcon className="size-6" />
                         </a>
                       )}
                     </li>
@@ -333,7 +334,8 @@ export function VisitorRegisterModal(props: VisitorRegisterModalProps) {
                     href={`tel:${selectedHouse.phone}`}
                     className="inline-flex items-center gap-1.5 text-blue-600 hover:underline font-bold"
                   >
-                    📞 {selectedHouse.phone}
+                    <PhoneIcon className="size-6" />
+                    {selectedHouse.phone}
                   </a>
                 ) : (
                   <span className="text-stone-400 text-xs italic">

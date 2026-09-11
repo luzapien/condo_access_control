@@ -7,7 +7,7 @@ export const ProtectedRoute = () => {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p>Loading condo access control...</p>
+        <p>Cargando...</p>
       </div>
     );
   }
@@ -16,5 +16,9 @@ export const ProtectedRoute = () => {
     return <Navigate to="/login" replace />;
   }
 
-  return <Outlet />;
+  return (
+    <main>
+      <Outlet />;
+    </main>
+  );
 };

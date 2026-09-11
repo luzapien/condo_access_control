@@ -27,7 +27,7 @@ export function RecentVehicles({
       setLoading(true);
       const { data, error } = await getVehiclesWithHousesQuery()
         .order("created_at", { ascending: false })
-        .limit(5);
+        .limit(3);
 
       if (error) {
         console.error("Error al cargar recientes:", error);
@@ -78,11 +78,11 @@ export function RecentVehicles({
 
             let badgeColor =
               "bg-emerald-100 text-emerald-800 border-emerald-200";
-            let labelText = "INGRESÓ " + formattedTime;
+            let labelText = formattedTime;
 
             if (item.vehicle_type === "visitor") {
-              badgeColor = "bg-amber-100 text-amber-800 border-amber-200";
-              labelText = "VISITANTE " + formattedTime;
+              badgeColor = "bg-blue-100 text-blue-800 border-blue-200";
+              labelText = formattedTime;
             }
 
             return (
@@ -105,9 +105,14 @@ export function RecentVehicles({
                   </div>
 
                   <div className="space-y-1">
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-12">
                       <span className="inline-flex items-center bg-white border border-stone-800 rounded px-2 py-0.5 text-stone-900 font-mono text-sm font-bold tracking-wider shadow-inner">
                         {item.license_plate}
+                      </span>
+                      <span
+                        className={`text-[10px] font-extrabold px-2 py-1 rounded-md border uppercase tracking-wider ${badgeColor}`}
+                      >
+                        {labelText}
                       </span>
                     </div>
 
@@ -132,11 +137,6 @@ export function RecentVehicles({
                 </div>
 
                 <div className="flex items-center space-x-2 shrink-0">
-                  <span
-                    className={`text-[10px] font-extrabold px-2 py-1 rounded-md border uppercase tracking-wider ${badgeColor}`}
-                  >
-                    {labelText}
-                  </span>
                   <svg
                     className="w-4 h-4 text-stone-400"
                     fill="none"
